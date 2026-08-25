@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoTokyo Elite Citizens For Sale</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <h1>NeoTokyo Elite Citizens</h1>
+  <p class="subtitle">Elite-rarity Citizens (rank &lt; <span id="threshold">500</span>) currently listed on OpenSea</p>
+  <p class="updated" id="updated">Loading...</p>
+</header>
+
+<main>
+  <div id="empty-state" class="empty-state" hidden>
+    No Elite Citizens are currently listed for sale. Check back later.
+  </div>
+  <div id="grid" class="grid"></div>
+</main>
+
+<footer class="site-footer">
+  <p>Rarity data from <a href="https://neotokyo.codes/citizens" target="_blank" rel="noopener">neotokyo.codes</a>. Listings from <a href="https://opensea.io/collection/neotokyo-citizens" target="_blank" rel="noopener">OpenSea</a>. Not affiliated with NeoTokyo or OpenSea.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
