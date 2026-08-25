@@ -30,6 +30,14 @@ async function getEliteRanks() {
   const page = await browser.newPage();
   const ranks = new Map(); // tokenId (string) -> rarityMonRank (number)
 
+  // The API response itself reports pagination state (`hasMore`, `count`),
+  // which is authoritative — far more reliable than inferring it from the
+  // pagination button's DOM/disabled state, which can race with React
+  // re-rendering the control after each click.
+  let responsesSeen = 0;
+  let hasMore = true;
+  let totalCount = null;
+
   const captureFromResponse = async (response) => {
     if (!response.url().includes('/api/rpc/getCitizens') || response.status() !== 200) return;
     let data;
@@ -38,45 +46,66 @@ async function getEliteRanks() {
     } catch {
       return;
     }
-    const list = data?.result?.citizens ?? [];
-    for (const c of list) {
+    const result = data?.result;
+    if (!result) return;
+    for (const c of result.citizens ?? []) {
       if (typeof c.rarityMonRank === 'number' && c.rarityMonRank < RARITY_THRESHOLD) {
         ranks.set(String(c.tokenId), c.rarityMonRank);
       }
     }
+    hasMore = Boolean(result.hasMore);
+    if (typeof result.count === 'number') totalCount = result.count;
+    responsesSeen += 1;
   };
 
   page.on('response', captureFromResponse);
+  const getResponsesSeen = () => responsesSeen;
 
-  const firstResponse = page.waitForResponse(
-    (r) => r.url().includes('/api/rpc/getCitizens') && r.status() === 200,
-    { timeout: 30000 }
-  );
   await page.goto(FILTER_URL, { waitUntil: 'domcontentloaded' });
-  await firstResponse;
+  await waitForResponseCount(1, getResponsesSeen);
+  console.log(`  Page 1: ${ranks.size}${totalCount != null ? ` of ${totalCount}` : ''} so far (hasMore=${hasMore})`);
 
-  // Click through pagination ("Go to next page") until it's disabled or we
-  // stop discovering new token ids. Capped as a safety net against an
-  // unexpected infinite loop if the site's markup changes.
-  for (let i = 0; i < 30; i++) {
+  // Click "Go to next page" until the API itself reports no more pages.
+  // Capped as a safety net against an unexpected infinite loop if the
+  // site's markup or response shape changes.
+  for (let i = 0; i < 30 && hasMore; i++) {
     const nextButton = page.getByRole('button', { name: 'Go to next page' });
-    const count = await nextButton.count();
-    if (count === 0) break;
-    const disabled = await nextButton.first().isDisabled().catch(() => true);
-    if (disabled) break;
+    // The button isn't necessarily in the DOM the instant the network
+    // response resolves — React still has to commit the re-render. Wait
+    // for it to actually appear rather than checking synchronously.
+    const appeared = await nextButton
+      .first()
+      .waitFor({ state: 'attached', timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!appeared) {
+      console.log('  No "Go to next page" button found; stopping.');
+      break;
+    }
 
-    const sizeBefore = ranks.size;
-    const nextResponse = page.waitForResponse(
-      (r) => r.url().includes('/api/rpc/getCitizens') && r.status() === 200,
-      { timeout: 30000 }
-    );
+    const seenBefore = responsesSeen;
     await nextButton.first().click();
-    await nextResponse;
-    if (ranks.size === sizeBefore) break; // no new data came in, stop
+    const gotResponse = await waitForResponseCount(seenBefore + 1, getResponsesSeen, 15000);
+    if (!gotResponse) {
+      console.log('  Timed out waiting for the next page\'s response; stopping.');
+      break;
+    }
+    console.log(`  Page ${i + 2}: ${ranks.size}${totalCount != null ? ` of ${totalCount}` : ''} so far (hasMore=${hasMore})`);
   }
 
   await browser.close();
   return ranks;
+}
+
+// Polls `getter()` until it reaches `target` or `timeoutMs` elapses.
+// Returns whether the target was reached.
+async function waitForResponseCount(target, getter, timeoutMs = 30000) {
+  const start = Date.now();
+  while (getter() < target) {
+    if (Date.now() - start > timeoutMs) return false;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  return true;
 }
 
 // --- Step 2: get current active OpenSea listings for the collection ---
