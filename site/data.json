@@ -1,9 +1,17 @@
 {
-  "generatedAt": "2026-10-11T15:28:59.364Z",
+  "generatedAt": "2026-10-11T20:04:25.838Z",
   "rarityThreshold": 500,
   "collectionSlug": "neotokyo-citizens",
-  "count": 5,
+  "count": 6,
   "citizens": [
+    {
+      "tokenId": "3969",
+      "price": 1.99,
+      "currency": "ETH",
+      "openseaUrl": "https://opensea.io/assets/ethereum/0xB9951B43802dCF3ef5b14567cb17adF367ed1c0F/3969",
+      "rarityRank": 451,
+      "image": "https://neo-tokyo.nyc3.cdn.digitaloceanspaces.com/s1Citizen/pngs/3969.png"
+    },
     {
       "tokenId": "1523",
       "price": 2.12,
