@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-29T18:52:37.315Z",
+  "generatedAt": "2026-10-29T23:09:56.568Z",
   "rarityThreshold": 500,
   "collectionSlug": "neotokyo-citizens",
-  "count": 6,
+  "count": 4,
   "citizens": [
     {
       "tokenId": "2980",
@@ -21,14 +21,6 @@
       "image": "https://neo-tokyo.nyc3.cdn.digitaloceanspaces.com/s1Citizen/pngs/4019.png"
     },
     {
-      "tokenId": "1239",
-      "price": 5.7,
-      "currency": "ETH",
-      "openseaUrl": "https://opensea.io/assets/ethereum/0xB9951B43802dCF3ef5b14567cb17adF367ed1c0F/1239",
-      "rarityRank": 343,
-      "image": "https://neo-tokyo.nyc3.cdn.digitaloceanspaces.com/s1Citizen/pngs/1239.png"
-    },
-    {
       "tokenId": "2912",
       "price": 15,
       "currency": "ETH",
@@ -43,14 +35,6 @@
       "openseaUrl": "https://opensea.io/assets/ethereum/0xB9951B43802dCF3ef5b14567cb17adF367ed1c0F/3187",
       "rarityRank": 16,
       "image": "https://neo-tokyo.nyc3.cdn.digitaloceanspaces.com/s1Citizen/pngs/3187.png"
-    },
-    {
-      "tokenId": "3163",
-      "price": 45,
-      "currency": "ETH",
-      "openseaUrl": "https://opensea.io/assets/ethereum/0xB9951B43802dCF3ef5b14567cb17adF367ed1c0F/3163",
-      "rarityRank": 40,
-      "image": "https://neo-tokyo.nyc3.cdn.digitaloceanspaces.com/s1Citizen/pngs/3163.png"
     }
   ]
 }
